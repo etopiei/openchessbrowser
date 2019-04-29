@@ -1,0 +1,6 @@
+.appveyor.yml
+.cargo-ok
+.travis.yml
+target/*
+www/node_modules/*
+www/.bin/*
