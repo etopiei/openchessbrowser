@@ -31,6 +31,25 @@ function updateAvailableMoves(s) {
     moves.pop(); // account for superfluous comma at end of string
 }
 
+function getGamesWhereFENOccured(fen) {
+    return fetch('http://localhost:3000/', {method: "POST", body: fen, headers: {'Content-Type': 'application/json'}}).then(res => res.json());
+}
+
+function updateList(gameData) {
+    const gameContainer = document.getElementById('game-list');
+    // clear old table
+    // add new games to table
+    gameData.forEach((game) => {
+        let item = document.createElement('li');
+        item.innerText = game.event;
+        gameContainer.appendChild(item);
+    });
+}
+
 // Initial Setup
 updateAvailableMoves(chessbrowser.getInitalMoves());
 fen = chessbrowser.getFEN();
+console.log(fen);
+getGamesWhereFENOccured(fen).then(gameData => {
+    updateList(gameData);
+});
