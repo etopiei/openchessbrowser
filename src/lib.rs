@@ -1,5 +1,3 @@
-mod utils;
-
 use wasm_bindgen::prelude::*;
 use pleco::{Board, BitMove, MoveList};
 use pleco::core::{File, Rank};
@@ -12,10 +10,11 @@ use pleco::SQ;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
+#[derive(Default)]
 pub struct ChessBrowser {
     current_board: Board,
     moves: MoveList,
-    moveHistory: Vec<BitMove>,
+    move_history: Vec<BitMove>,
 }
 
 #[wasm_bindgen]
@@ -25,17 +24,17 @@ impl ChessBrowser {
         // Create a global board and moves object for game state
         let current_board = Board::start_pos();
         let moves = MoveList::default();
-        let moveHistory = Vec::new();
+        let move_history = Vec::new();
 
         // Initalise object with state and return it
         ChessBrowser {
             current_board,
             moves,
-            moveHistory,
+            move_history
         }
     }
 
-    fn movesToStr(&self) -> String {
+    fn moves_to_str(&self) -> String {
         let mut moves_string: String = "".to_string();
         for x in self.moves.iter() {
             moves_string = moves_string + &x.to_string() + ",";
@@ -43,16 +42,16 @@ impl ChessBrowser {
         moves_string
     }
 
-    fn addToHistory(&mut self, newMove: BitMove) {
-        self.moveHistory.push(newMove);
+    fn add_to_history(&mut self, new_move: BitMove) {
+        self.move_history.push(new_move);
     }
 
-    fn playMove(&mut self, newMove: &BitMove) {
-        self.current_board.apply_move(*newMove);
+    fn play_move(&mut self, new_move: BitMove) {
+        self.current_board.apply_move(new_move);
     }
 
-    fn fileFromChar(file: char) -> Option<File> {
-        return match file {
+    fn file_from_char(file: char) -> Option<File> {
+        match file {
             'a' => Some(File::A),
             'b' => Some(File::B),
             'c' => Some(File::C),
@@ -64,8 +63,8 @@ impl ChessBrowser {
         }
     }
 
-    fn rankFromChar(rank: char) -> Option<Rank> {
-        return match rank {
+    fn rank_from_char(rank: char) -> Option<Rank> {
+        match rank {
             '1' => Some(Rank::R1),
             '2' => Some(Rank::R2),
             '3' => Some(Rank::R3),
@@ -78,52 +77,52 @@ impl ChessBrowser {
         }
     }
 
-    fn makeBitMoveFromString(moveString: &str) -> Option<BitMove> {
-        let srcFile = match ChessBrowser::fileFromChar(moveString.chars().nth(0).unwrap()) {
-            Some(srcFile) => srcFile,
+    fn make_bitmove_from_str(move_string: &str) -> Option<BitMove> {
+        let src_file = match ChessBrowser::file_from_char(move_string.chars().nth(0).unwrap()) {
+            Some(src_file) => src_file,
             None => return None
         };
-        let srcRank = match ChessBrowser::rankFromChar(moveString.chars().nth(1).unwrap()) {
-            Some(srcRank) => srcRank,
-            None => return None
-        };
-
-        let srcSquare = SQ::make(srcFile, srcRank);
-
-        let destFile = match ChessBrowser::fileFromChar(moveString.chars().nth(2).unwrap()) {
-            Some(destFile) => destFile,
-            None => return None
-        };
-        let destRank = match ChessBrowser::rankFromChar(moveString.chars().nth(3).unwrap()) {
-            Some(destRank) => destRank,
+        let src_rank = match ChessBrowser::rank_from_char(move_string.chars().nth(1).unwrap()) {
+            Some(src_rank) => src_rank,
             None => return None
         };
 
-        let destSquare = SQ::make(destFile, destRank);
-        Some(BitMove::make(0, srcSquare, destSquare))
+        let src_square = SQ::make(src_file, src_rank);
+
+        let dest_file = match ChessBrowser::file_from_char(move_string.chars().nth(2).unwrap()) {
+            Some(dest_file) => dest_file,
+            None => return None
+        };
+        let dest_rank = match ChessBrowser::rank_from_char(move_string.chars().nth(3).unwrap()) {
+            Some(dest_rank) => dest_rank,
+            None => return None
+        };
+
+        let dest_square = SQ::make(dest_file, dest_rank);
+        Some(BitMove::make(0, src_square, dest_square))
     }
 
-    pub fn makeMove(&mut self, moveString: &str) -> String {
+    pub fn make_move(&mut self, move_string: &str) -> String {
         // Create the move from string
-        if let Some(newMove) = ChessBrowser::makeBitMoveFromString(moveString) {
+        if let Some(new_move) = ChessBrowser::make_bitmove_from_str(move_string) {
             // Make move on the board
-            self.playMove(&newMove);
+            self.play_move(new_move);
             // Add move to move history
-            self.addToHistory(newMove);
+            self.add_to_history(new_move);
             // Update moves
             self.moves = self.current_board.generate_moves();
         }
         // Return the moves
-        self.movesToStr()
+        self.moves_to_str()
     }
 
-    pub fn getInitalMoves(&mut self) -> String {
+    pub fn get_initial_moves(&mut self) -> String {
         // Update moves to represent all possible moves from the current board state
         self.moves = self.current_board.generate_moves();
-        self.movesToStr()
+        self.moves_to_str()
     }
 
-    pub fn getFEN(&self) -> String {
+    pub fn get_fen(&self) -> String {
         self.current_board.fen()
     }
 }
