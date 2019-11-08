@@ -10,8 +10,13 @@ const dropPiece = (src, dest) => {
     const valid = moves.includes(src + dest) ? true : 'snapback';
     if (valid != 'snapback') {
         // make the move
-        updateAvailableMoves(chessbrowser.makeMove(src+dest));
-        fen = chessbrowser.getFEN();
+        const move = src + dest;
+        updateAvailableMoves(chessbrowser.makeMove(move));
+        newFen = chessbrowser.getFEN();
+        if (fen === newFen) {
+            valid = 'snapback'
+        }
+        fen = newFen;
     }
     return valid;
 };
