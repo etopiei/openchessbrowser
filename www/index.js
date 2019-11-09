@@ -2,7 +2,7 @@ import { ChessBrowser } from '../pkg/openchessbrowser';
 
 let moves = [];
 let fen = '';
-let chessbrowser = new ChessBrowser();
+let chessbrowser = ChessBrowser.new();
 
 const dropPiece = (src, dest) => {
     // check move valid
@@ -11,10 +11,14 @@ const dropPiece = (src, dest) => {
     if (valid != 'snapback') {
         // make the move
         const move = src + dest;
-        updateAvailableMoves(chessbrowser.makeMove(move));
-        newFen = chessbrowser.getFEN();
+        updateAvailableMoves(chessbrowser.make_move(move));
+        const newFen = chessbrowser.get_fen();
         if (fen === newFen) {
             valid = 'snapback'
+        } else {
+            getGamesWhereFENOccured(fen).then(gameData => {
+                updateList(gameData);
+            });
         }
         fen = newFen;
     }
@@ -52,7 +56,7 @@ function updateList(gameData) {
 }
 
 // Initial Setup
-updateAvailableMoves(chessbrowser.get_inital_moves());
+updateAvailableMoves(chessbrowser.get_initial_moves());
 fen = chessbrowser.get_fen();
 console.log(fen);
 getGamesWhereFENOccured(fen).then(gameData => {
