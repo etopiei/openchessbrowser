@@ -1,17 +1,18 @@
-const wasm_chess = require('../pkg/openchessbrowser');
-const ChessBrowser = wasm_chess.ChessBrowser;
+const move_mapper = require('./mapper.js');
+import { ChessBrowser } from '../pkg/openchessbrowser';
 
 let moves = [];
 let fen = '';
-let chessbrowser = ChessBrowser.new();
+let chessbrowser = new ChessBrowser();
 
 const dropPiece = (src, dest) => {
     // check move valid
+    console.log(moves, src, dest);
     const valid = moves.includes(src + dest) ? true : 'snapback';
     if (valid != 'snapback') {
         // make the move
-        updateAvailableMoves(chessbrowser.makeMove(src+dest));
-        fen = chessbrowser.getFEN();
+        updateAvailableMoves(chessbrowser.make_move(move_mapper.move_map[src], move_mapper.move_map[dest]));
+        fen = chessbrowser.get_fen();
     }
     return valid;
 };
@@ -36,8 +37,8 @@ function getGamesWhereFENOccured(fen) {
 }
 
 function updateList(gameData) {
-    const gameContainer = document.getElementById('game-list');
-    // clear old table
+    const gameContainer = document.getElementById('game-list-grid');
+    gameContainer.innerText = "";
     // add new games to table
     gameData.forEach((game) => {
         let item = document.createElement('li');
@@ -47,8 +48,8 @@ function updateList(gameData) {
 }
 
 // Initial Setup
-updateAvailableMoves(chessbrowser.getInitalMoves());
-fen = chessbrowser.getFEN();
+updateAvailableMoves(chessbrowser.get_inital_moves());
+fen = chessbrowser.get_fen();
 console.log(fen);
 getGamesWhereFENOccured(fen).then(gameData => {
     updateList(gameData);
