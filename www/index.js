@@ -1,4 +1,3 @@
-const move_mapper = require('./mapper.js');
 import { ChessBrowser } from '../pkg/openchessbrowser';
 
 let moves = [];
@@ -11,8 +10,13 @@ const dropPiece = (src, dest) => {
     const valid = moves.includes(src + dest) ? true : 'snapback';
     if (valid != 'snapback') {
         // make the move
-        updateAvailableMoves(chessbrowser.make_move(move_mapper.move_map[src], move_mapper.move_map[dest]));
-        fen = chessbrowser.get_fen();
+        const move = src + dest;
+        updateAvailableMoves(chessbrowser.makeMove(move));
+        newFen = chessbrowser.getFEN();
+        if (fen === newFen) {
+            valid = 'snapback'
+        }
+        fen = newFen;
     }
     return valid;
 };
@@ -24,7 +28,7 @@ const boardConfig = {
     position: 'start'
 };
 
-const board = ChessBoard('chess-board', boardConfig);
+ChessBoard('chess-board', boardConfig);
 
 function updateAvailableMoves(s) {
     moves = [];
