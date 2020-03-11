@@ -112,8 +112,16 @@ impl ChessBrowser {
             // Update moves
             self.moves = self.current_board.generate_moves();
         }
-        // Return the moves
+        // Return the moves now available
         self.moves_to_str()
+    }
+
+    pub fn is_check_mate(&self) -> bool {
+        self.current_board.checkmate()
+    }
+
+    pub fn get_latest_move(&self) -> String {
+        self.move_history.last().unwrap().stringify()
     }
 
     pub fn get_initial_moves(&mut self) -> String {

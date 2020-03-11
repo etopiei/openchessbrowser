@@ -1,0 +1,11 @@
+.whiteWin {
+    background-color: white !important;
+}
+
+.blackWin {
+    background-color: black !important;
+}
+
+.draw {
+    background-color: gray !important;
+}
